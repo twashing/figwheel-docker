@@ -1,6 +1,11 @@
 (ns user
   (:require
-   [figwheel-sidecar.repl-api :as f]))
+   [figwheel-sidecar.repl-api :as f]
+   [ring.adapter.jetty :as jetty]
+   [compojure.core :refer :all]
+   [compojure.route :as route]
+   [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+   [ring.util.response :as response]))
 
 ;; user is a namespace that the Clojure runtime looks for and
 ;; loads if its available
@@ -18,6 +23,49 @@
 ;; tools.namespace https://github.com/clojure/tools.namespace
 ;; and Component https://github.com/stuartsierra/component
 
+
+(defonce dev-state (atom {}))
+
+(defroutes app-routes
+  ;; NOTE: this will deliver all of your assets from the public directory
+  ;; of resources i.e. resources/public
+  (route/resources "/" {:root "public"})
+  ;; NOTE: this will deliver your index.html
+  (GET "/" [] (-> (response/resource-response "index.html" {:root "public"})
+                  (response/content-type "text/html")))
+  (GET "/hello" [] "Hello World!")
+  (route/not-found "Not Found"))
+
+(def app (wrap-defaults app-routes site-defaults))
+
+;; this development application has a var reference to the app-routes above
+;; for friendlier REPL based reloading
+(def dev-app (wrap-defaults #'app-routes site-defaults))
+
+
+;; ===
+
+(defn start-server
+  "Starts a ring server for your developement application"
+  []
+  (if-not (:ring-server @dev-state)
+    (swap! dev-state assoc :ring-server
+
+           ;; NOTE using var for better REPL reloading dev experience
+           ;; (ring-server/serve #'server-handler/dev-app {:open-browser? false})
+           (jetty/run-jetty #'dev-app {:port 8080}))
+    (println "Server already running!")))
+
+(defn stop-server
+  "Stops the running ring server."
+  []
+  (when-let [ring-server (:ring-server @dev-state)]
+    (swap! dev-state dissoc :ring-server)
+    (println "Stopping ring server!")
+    (.stop ring-server)))
+
+
+;; ===
 
 (defn fig-start
   "This starts the figwheel server and watch based auto-compiler."

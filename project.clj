@@ -13,9 +13,13 @@
                  [cljsjs/react "15.4.2-1"]
                  [cljsjs/react-dom "15.4.2-1"]
                  [sablono "0.7.7"]
-                 [org.omcljs/om "1.0.0-alpha46"]]
+                 [org.omcljs/om "1.0.0-alpha46"]
 
-  :plugins [[lein-figwheel "0.5.9"]
+                 [ring "1.5.0"]
+                 [ring/ring-defaults "0.2.3"]
+                 [compojure "1.5.0"]]
+
+  :plugins [[lein-figwheel "0.5.10-SNAPSHOT"]
             [lein-cljsbuild "1.1.5" :exclusions [[org.clojure/clojure]]]]
 
   :source-paths ["src"]
@@ -34,7 +38,7 @@
                            ;; in the default browser once Figwheel has
                            ;; started and complied your application.
                            ;; Comment this out once it no longer serves you.
-                           :open-urls ["http://localhost:3449/index.html"]}
+                           :open-urls ["http://localhost:8080/index.html"]}
 
                 :compiler {:main finops-admin.core
                            :asset-path "js/compiled/out"
@@ -57,6 +61,9 @@
   :figwheel {;; :http-server-root "public" ;; default and assumes "resources"
              ;; :server-port 3449 ;; default
              ;; :server-ip "127.0.0.1"
+
+             :init     user/start-server
+             :destroy  user/stop-server
 
              :css-dirs ["resources/public/css"] ;; watch and update CSS
 
@@ -97,7 +104,7 @@
 
 
   :profiles {:dev {:dependencies [[binaryage/devtools "0.9.0"]
-                                  [figwheel-sidecar "0.5.9"]
+                                  [figwheel-sidecar "0.5.10-SNAPSHOT"]
                                   [com.cemerick/piggieback "0.2.1"]]
                    ;; need to add dev source path here to get user.clj loaded
                    :source-paths ["src" "dev"]
