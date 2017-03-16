@@ -1,0 +1,6 @@
+FROM quay.io/fundingcircle/nrepl:base
+MAINTAINER team-usjanus <us-janus@fundingcircle.com>
+
+WORKDIR /usr/src/app
+COPY . ./
+CMD ["/bin/bash"]

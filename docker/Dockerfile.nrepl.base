@@ -1,0 +1,7 @@
+FROM clojure:latest
+MAINTAINER team-usjanus <us-janus@fundingcircle.com>
+
+WORKDIR /usr/src/app
+COPY . ./
+RUN cd /usr/src/app \
+    && lein deps 
