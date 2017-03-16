@@ -59,7 +59,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: docker/Dockerfile.finops-admin.yml
+      dockerfile: docker/Dockerfile.finops-admin
     image: quay.io/fundingcircle/finops-admin:dev
     depends_on:
       - kafka
